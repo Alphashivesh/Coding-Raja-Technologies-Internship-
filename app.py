@@ -74,38 +74,54 @@ def save_budgets(budgets: dict):
         json.dump(budgets, f, indent=2)
 
 
+import pandas as pd
+
 def read_expenses():
+    expected_cols = ["date", "category", "description", "amount"]
     try:
         df = pd.read_csv(EXP_FILE)
-        # Ensure headers exist
-        expected_cols = ["date", "category", "description", "amount"]
+        # Reset if missing headers or empty
         if df.empty or not all(col in df.columns for col in expected_cols):
             df = pd.DataFrame(columns=expected_cols)
         else:
             df['date'] = pd.to_datetime(df['date'], errors="coerce").dt.date
         return df
     except FileNotFoundError:
-        # Create file with headers if not exists
-        df = pd.DataFrame(columns=["date", "category", "description", "amount"])
+        df = pd.DataFrame(columns=expected_cols)
         df.to_csv(EXP_FILE, index=False)
         return df
 
 
-
 def read_income():
-    df = pd.read_csv(INC_FILE)
-    if not df.empty:
-        df['date'] = pd.to_datetime(df['date']).dt.date
-        df['amount'] = pd.to_numeric(df['amount'], errors='coerce').fillna(0.0)
-    return df
+    expected_cols = ["date", "source", "amount"]
+    try:
+        df = pd.read_csv(INC_FILE)
+        if df.empty or not all(col in df.columns for col in expected_cols):
+            df = pd.DataFrame(columns=expected_cols)
+        else:
+            df['date'] = pd.to_datetime(df['date'], errors="coerce").dt.date
+        return df
+    except FileNotFoundError:
+        df = pd.DataFrame(columns=expected_cols)
+        df.to_csv(INC_FILE, index=False)
+        return df
 
 
 def read_recurring():
-    df = pd.read_csv(REC_FILE)
-    if not df.empty:
-        df['amount'] = pd.to_numeric(df['amount'], errors='coerce').fillna(0.0)
-        df['next_date'] = pd.to_datetime(df['next_date']).dt.date
-    return df
+    expected_cols = ["date", "category", "description", "amount", "frequency", "next_date"]
+    try:
+        df = pd.read_csv("recurring.csv")
+        if df.empty or not all(col in df.columns for col in expected_cols):
+            df = pd.DataFrame(columns=expected_cols)
+        else:
+            df['date'] = pd.to_datetime(df['date'], errors="coerce").dt.date
+            df['next_date'] = pd.to_datetime(df['next_date'], errors="coerce").dt.date
+        return df
+    except FileNotFoundError:
+        df = pd.DataFrame(columns=expected_cols)
+        df.to_csv("recurring.csv", index=False)
+        return df
+
 
 
 def write_csv(df: pd.DataFrame, path: str):
