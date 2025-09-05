@@ -75,11 +75,21 @@ def save_budgets(budgets: dict):
 
 
 def read_expenses():
-    df = pd.read_csv(EXP_FILE)
-    if not df.empty:
-        df['date'] = pd.to_datetime(df['date']).dt.date
-        df['amount'] = pd.to_numeric(df['amount'], errors='coerce').fillna(0.0)
-    return df
+    try:
+        df = pd.read_csv(EXP_FILE)
+        # Ensure headers exist
+        expected_cols = ["date", "category", "description", "amount"]
+        if df.empty or not all(col in df.columns for col in expected_cols):
+            df = pd.DataFrame(columns=expected_cols)
+        else:
+            df['date'] = pd.to_datetime(df['date'], errors="coerce").dt.date
+        return df
+    except FileNotFoundError:
+        # Create file with headers if not exists
+        df = pd.DataFrame(columns=["date", "category", "description", "amount"])
+        df.to_csv(EXP_FILE, index=False)
+        return df
+
 
 
 def read_income():
