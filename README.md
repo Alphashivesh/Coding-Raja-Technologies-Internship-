@@ -3,7 +3,7 @@
 ## 🚀 Live Demo
 
 Try the app here:  
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-username-your-repo-name.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://eulj5unitfwym7bxqjaafw.streamlit.app/)
 
 ---
 
